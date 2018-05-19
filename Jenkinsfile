@@ -2,37 +2,83 @@ pipeline {
   agent none
   stages {
     stage('Configure') {
-      agent {
-        node {
-          label 'linux'
-        }
+      parallel {
+        stage('Configure on Debian 9 libssl 1.0') {
+          agent {
+            node {
+              label 'debian-9-libssl10'
+            }
 
-      }
-      steps {
-        sh './bootstrap'
-        sh './configure'
+          }
+          steps {
+            sh './bootstrap'
+            sh './configure'
+          }
+        }
+        stage('Configure on Debian 9 libssl 1.1') {
+          agent {
+            node {
+              label 'debian-9-libssl11'
+            }
+
+          }
+          steps {
+            sh './bootstrap'
+            sh './configure'
+          }
+        }
       }
     }
     stage('Build backup client') {
-      agent {
-        node {
-          label 'linux'
-        }
+      parallel {
+        stage('Debian 9 libssl 1.0') {
+          agent {
+            node {
+              label 'debian-9-libssl10'
+            }
 
-      }
-      steps {
-        sh 'make build-backup-client'
+          }
+          steps {
+            sh 'make build-backup-client'
+          }
+        }
+        stage('Debian 9 libssl 1.1') {
+          agent {
+            node {
+              label 'debian-9-libssl11'
+            }
+
+          }
+          steps {
+            sh 'make build-backup-client'
+          }
+        }
       }
     }
     stage('Build backup server') {
-      agent {
-        node {
-          label 'linux'
-        }
+      parallel {
+        stage('Debian 9 libssl 1.0') {
+          agent {
+            node {
+              label 'debian-9-libssl10'
+            }
 
-      }
-      steps {
-        sh 'make build-backup-server'
+          }
+          steps {
+            sh 'make build-backup-server'
+          }
+        }
+        stage('Debian 9 libssl 1.1') {
+          agent {
+            node {
+              label 'debian-9-libssl11'
+            }
+
+          }
+          steps {
+            sh 'make build-backup-server'
+          }
+        }
       }
     }
   }
